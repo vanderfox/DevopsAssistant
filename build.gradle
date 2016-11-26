@@ -1,12 +1,16 @@
 buildscript {
     repositories {
         mavenLocal()
+        jcenter()
         maven { url "https://repo.grails.org/grails/core" }
+        maven { url "https://repo.grails.org/grails/plugins" }
+
     }
     dependencies {
         classpath "org.grails:grails-gradle-plugin:$grailsVersion"
         classpath "com.bertramlabs.plugins:asset-pipeline-gradle:2.11.6"
         classpath "org.grails.plugins:hibernate5:6.0.4"
+        classpath 'org.hidetake:gradle-ssh-plugin:2.7.0'
     }
 }
 
@@ -19,10 +23,15 @@ apply plugin:"war"
 apply plugin:"org.grails.grails-web"
 apply plugin:"org.grails.grails-gsp"
 apply plugin:"asset-pipeline"
+apply plugin: 'org.hidetake.ssh'
 
 repositories {
     mavenLocal()
+    jcenter()
     maven { url "https://repo.grails.org/grails/core" }
+    maven {
+        url  "http://dl.bintray.com/rvanderwerf/alexa-skills"
+    }
 }
 
 dependencyManagement {
@@ -54,7 +63,8 @@ dependencies {
     testRuntime "org.seleniumhq.selenium:selenium-htmlunit-driver:2.47.1"
     testRuntime "net.sourceforge.htmlunit:htmlunit:2.18"
 
-    compile "org.grails.plugins:alexa-skills:0.1.2"
+    compile 'org.grails.plugins:alexa-skills:0.1.2'
+
     compile "com.amazonaws:aws-java-sdk-dynamodb:1.10.34"
     compile 'net.sf.json-lib:json-lib:2.4:jdk15'
     compile 'org.springframework.social:spring-social-twitter:1.1.2.RELEASE'
@@ -66,6 +76,14 @@ dependencies {
 
 
 
+}
+
+remotes {
+    deadpool {
+        role 'masterNode'
+        host = 'deadpool.vanderfox.com'
+        user = 'root'
+    }
 }
 
 bootRun {
