@@ -32,6 +32,9 @@ repositories {
     maven {
         url  "http://dl.bintray.com/rvanderwerf/alexa-skills"
     }
+    maven {
+        url  "http://dl.bintray.com/vanderfox/alexa-skills-kit-java"
+    }
 }
 
 dependencyManagement {
@@ -80,7 +83,7 @@ dependencies {
 
 remotes {
     deadpool {
-        role 'masterNode'
+        identity = file('id_rsa')
         host = 'deadpool.vanderfox.com'
         user = 'root'
     }
