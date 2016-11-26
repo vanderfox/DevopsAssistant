@@ -84,7 +84,7 @@ dependencies {
 
 remotes {
     deadpool {
-        identity = file('id_rsa')
+        identity = file('../../../.ssh/id_rsa')
         host = 'deadpool.vanderfox.com'
         user = 'root'
     }
@@ -101,8 +101,8 @@ assets {
 
 task deploy << {
     ssh.run {
-        session(remotes.webServer) {
-            put from: 'example.war', into: '/webapps'
+        session(remotes.deadpool) {
+            put from: 'build/libs/DevopsAssistant-0.1.war', into: '/opt/tomcat/webapps/DevopsAssistant.war'
             execute 'sudo service tomcat restart'
         }
     }
