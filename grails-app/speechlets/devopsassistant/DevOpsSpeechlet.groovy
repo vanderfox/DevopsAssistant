@@ -1,28 +1,33 @@
-package com.vanderfox.devops
+package devopsassistant
 
 import com.amazon.speech.slu.Intent
 import com.amazon.speech.slu.Slot
+import com.amazon.speech.speechlet.Context
 import com.amazon.speech.speechlet.IntentRequest
 import com.amazon.speech.speechlet.LaunchRequest
+import com.amazon.speech.speechlet.PlaybackFailedRequest
+import com.amazon.speech.speechlet.PlaybackFinishedRequest
+import com.amazon.speech.speechlet.PlaybackNearlyFinishedRequest
+import com.amazon.speech.speechlet.PlaybackStartedRequest
+import com.amazon.speech.speechlet.PlaybackStoppedRequest
 import com.amazon.speech.speechlet.Session
 import com.amazon.speech.speechlet.SessionEndedRequest
 import com.amazon.speech.speechlet.SessionStartedRequest
 import com.amazon.speech.speechlet.Speechlet
 import com.amazon.speech.speechlet.SpeechletException
 import com.amazon.speech.speechlet.SpeechletResponse
+import com.amazon.speech.speechlet.SystemExceptionEncounteredRequest
 import com.amazon.speech.ui.PlainTextOutputSpeech
 import com.amazon.speech.ui.Reprompt
 import com.amazon.speech.ui.SimpleCard
 import com.amazon.speech.ui.SsmlOutputSpeech
 import com.amazonaws.auth.AWSCredentials
 import com.amazonaws.auth.BasicAWSCredentials
-import com.amazonaws.regions.Region
 import com.amazonaws.services.cloudformation.AmazonCloudFormationClient
 import com.amazonaws.services.cloudformation.model.CreateStackRequest
 import com.amazonaws.services.cloudformation.model.CreateStackResult
 import com.amazonaws.services.cloudformation.model.Parameter
 import com.amazonaws.services.cloudwatch.AmazonCloudWatchClient
-import com.amazonaws.services.cloudwatch.model.DescribeAlarmsRequest
 import com.amazonaws.services.cloudwatch.model.DescribeAlarmsResult
 import com.amazonaws.services.cloudwatch.model.MetricAlarm
 import com.amazonaws.services.codedeploy.AmazonCodeDeployClient
@@ -35,11 +40,11 @@ import com.amazonaws.services.ec2.model.Filter
 import com.amazonaws.services.ec2.model.Instance
 import com.amazonaws.services.ec2.model.Reservation
 import com.amazonaws.services.sns.AmazonSNSClient
-import com.amazonaws.services.sns.model.GetTopicAttributesResult
 import com.amazonaws.services.sns.model.ListTopicsResult
 import com.amazonaws.services.sns.model.PublishRequest
-import com.amazonaws.services.sns.model.PublishResult
 import com.amazonaws.services.sns.model.Topic
+import grails.config.Config
+import grails.web.Controller
 import groovy.transform.CompileStatic
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory
@@ -52,6 +57,42 @@ import org.slf4j.LoggerFactory
 public class DevOpsSpeechlet implements Speechlet {
     private static final Logger log = LoggerFactory.getLogger(DevOpsSpeechlet.class);
     private boolean keepRunning = false
+
+
+    def grailsApplication
+
+    Config grailsConfig
+    def speechletService
+
+    @Override
+    SpeechletResponse onPlaybackStarted(PlaybackStartedRequest playbackStartedRequest, Context context) throws SpeechletException {
+        return null
+    }
+
+    @Override
+    SpeechletResponse onPlaybackFinished(PlaybackFinishedRequest playbackFinishedRequest, Context context) throws SpeechletException {
+        return null
+    }
+
+    @Override
+    void onPlaybackStopped(PlaybackStoppedRequest playbackStoppedRequest, Context context) throws SpeechletException {
+
+    }
+
+    @Override
+    SpeechletResponse onPlaybackNearlyFinished(PlaybackNearlyFinishedRequest playbackNearlyFinishedRequest, Context context) throws SpeechletException {
+        return null
+    }
+
+    @Override
+    SpeechletResponse onPlaybackFailed(PlaybackFailedRequest playbackFailedRequest, Context context) throws SpeechletException {
+        return null
+    }
+
+    @Override
+    void onSystemException(SystemExceptionEncounteredRequest systemExceptionEncounteredRequest) throws SpeechletException {
+
+    }
 
     @Override
     public void onSessionStarted(final SessionStartedRequest request, final Session session)
@@ -72,7 +113,7 @@ public class DevOpsSpeechlet implements Speechlet {
     }
 
     @Override
-    public SpeechletResponse onIntent(final IntentRequest request, final Session session)
+    public SpeechletResponse onIntent(final IntentRequest request, final Session session, Context context)
             throws SpeechletException {
         log.info("onIntent requestId={}, sessionId={}", request.getRequestId(),
                 session.getSessionId());
@@ -312,4 +353,23 @@ public class DevOpsSpeechlet implements Speechlet {
      */
     private void initializeComponents(Session session) {
     }
+}
+
+
+/**
+ * this inner controller handles incoming requests - be sure to white list it with SpringSecurity
+ * or whatever you are using
+ */
+@Controller
+class DevOpsController {
+
+    def speechletService
+    def devOpsSpeechlet
+
+
+    def index() {
+        speechletService.doSpeechlet(request,response, devopsAssistantSpeechlet)
+    }
+
+
 }

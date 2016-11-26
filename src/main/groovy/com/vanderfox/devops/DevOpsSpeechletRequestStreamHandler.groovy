@@ -1,6 +1,7 @@
 package com.vanderfox.devops
 
 import com.amazon.speech.speechlet.lambda.SpeechletRequestStreamHandler
+import devopsassistant.DevOpsSpeechlet
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
