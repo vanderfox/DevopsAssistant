@@ -23,6 +23,9 @@ import com.amazon.speech.ui.SimpleCard
 import com.amazon.speech.ui.SsmlOutputSpeech
 import com.amazonaws.auth.AWSCredentials
 import com.amazonaws.auth.BasicAWSCredentials
+import com.amazonaws.services.apigateway.model.UpdateAuthorizerResult
+import com.amazonaws.services.autoscaling.AmazonAutoScalingClient
+import com.amazonaws.services.autoscaling.model.UpdateAutoScalingGroupRequest
 import com.amazonaws.services.cloudformation.AmazonCloudFormationClient
 import com.amazonaws.services.cloudformation.model.CreateStackRequest
 import com.amazonaws.services.cloudformation.model.CreateStackResult
@@ -57,7 +60,6 @@ import org.slf4j.LoggerFactory
 public class DevOpsSpeechlet implements Speechlet {
     private static final Logger log = LoggerFactory.getLogger(DevOpsSpeechlet.class);
     private boolean keepRunning = false
-
 
     def grailsApplication
 
@@ -140,7 +142,7 @@ public class DevOpsSpeechlet implements Speechlet {
                 countInstances(slotValue)
                 break
             case "sendSnsNotification":
-                sendSnsNotification("message")
+                sendSnsNotification("message", "lambdaNotification")
                 break
             case "AMAZON.HelpIntent":
                 getHelpResponse(session)
@@ -197,7 +199,7 @@ public class DevOpsSpeechlet implements Speechlet {
         keepRunning ? askResponse(speechText, speechText) : tellResponse(speechText, speechText)
     }
 
-    private SpeechletResponse sendSnsNotification(String message) {
+    private SpeechletResponse sendSnsNotification(String message, String topic) {
         AWSCredentials credentials = new BasicAWSCredentials("AKIAJLNQS6XTH3ESTCBQ", "4Ra3dZl9SAiY0PudxqWQUOmhIIY0JpYUW4ZfdWu+")
         AmazonSNSClient snsClient = new AmazonSNSClient(credentials)
         snsClient.setEndpoint("sns.us-east-1.amazonaws.com")
@@ -206,14 +208,19 @@ public class DevOpsSpeechlet implements Speechlet {
         String topicArn = ""
         for(Topic currentTopic: topics) {
             log.debug("currentTopic.topicArn:  " + currentTopic.topicArn)
-            if(currentTopic.topicArn.contains("lambdaNotification")) {
+            if(currentTopic.topicArn.contains(topic)) {
                 topicArn = currentTopic.getTopicArn()
             }
         }
-        log.debug("topicArn" + topicArn)
-        PublishRequest publishRequest = new PublishRequest(topicArn, message)
-        snsClient.publish(publishRequest)
-        String speechText = "OK, I've published your notification"
+        String speechText = ""
+        if(!topicArn.isEmpty()) {
+            log.debug("topicArn" + topicArn)
+            PublishRequest publishRequest = new PublishRequest(topicArn, message)
+            snsClient.publish(publishRequest)
+            speechText = "OK, I've published your notification"
+        } else {
+            speechText = "Sorry.  I was unable to find the right topic to send a notification to."
+        }
         keepRunning ? askResponse(speechText, speechText) : tellResponse(speechText, speechText)
     }
 
@@ -252,6 +259,19 @@ public class DevOpsSpeechlet implements Speechlet {
         CreateStackResult createStackResult = cloudFormationClient.createStack(createStackRequest)
 
         String speechText = "OK, I've started building your stack.  Give it a few minutes to complete."
+        keepRunning ? askResponse(speechText, speechText) : tellResponse(speechText, speechText)
+    }
+
+    private SpeechletResponse tuneAutoscaleGroup(int newNumberInstances) {
+        AWSCredentials credentials = new BasicAWSCredentials("AKIAJLNQS6XTH3ESTCBQ", "4Ra3dZl9SAiY0PudxqWQUOmhIIY0JpYUW4ZfdWu+")
+        AmazonAutoScalingClient autoScalingClient = new AmazonAutoScalingClient(credentials)
+        UpdateAutoScalingGroupRequest updateAutoScalingGroupRequest = new UpdateAutoScalingGroupRequest()
+        updateAutoScalingGroupRequest.setMaxSize(newNumberInstances)
+        updateAutoScalingGroupRequest.setMinSize(newNumberInstances)
+        updateAutoScalingGroupRequest.setDesiredCapacity(newNumberInstances)
+        UpdateAuthorizerResult updateAuthorizerResult = autoScalingClient.updateAutoScalingGroup(updateAutoScalingGroupRequest)
+
+        String speechText = "I have updated your autoscale group to have ${newNumberInstances}."
         keepRunning ? askResponse(speechText, speechText) : tellResponse(speechText, speechText)
     }
 
