@@ -141,6 +141,11 @@ public class DevOpsSpeechlet implements Speechlet {
                 String slotValue = slot.getValue()
                 countInstances(slotValue)
                 break
+            case "changeAutoscale":
+                Slot slot = intent.getSlot("newInstanceCount")
+                int newInstanceCount = Integer.parseInt(slot.getValue())
+                tuneAutoscaleGroup(newInstanceCount)
+                break
             case "sendSnsNotification":
                 sendSnsNotification("message", "lambdaNotification")
                 break
