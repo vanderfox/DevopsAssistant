@@ -67,7 +67,7 @@ import org.slf4j.LoggerFactory
 public class DevOpsSpeechlet implements Speechlet {
     private static final Logger log = LoggerFactory.getLogger(DevOpsSpeechlet.class);
     private boolean keepRunning = false
-
+    private AWSCredentials credentials
     def grailsApplication
 
     Config grailsConfig
@@ -108,6 +108,7 @@ public class DevOpsSpeechlet implements Speechlet {
             throws SpeechletException {
         log.info("onSessionStarted requestId={}, sessionId={}", request.getRequestId(),
                 session.getSessionId())
+        credentials = new BasicAWSCredentials("AKIAJLNQS6XTH3ESTCBQ", "4Ra3dZl9SAiY0PudxqWQUOmhIIY0JpYUW4ZfdWu+")
         initializeComponents(session)
 
         // any initialization logic goes here
@@ -207,7 +208,6 @@ public class DevOpsSpeechlet implements Speechlet {
     }
 
     private SpeechletResponse cloudwatchAlarms() {
-        AWSCredentials credentials = new BasicAWSCredentials("AKIAJLNQS6XTH3ESTCBQ", "4Ra3dZl9SAiY0PudxqWQUOmhIIY0JpYUW4ZfdWu+")
         AmazonCloudWatchClient cloudWatchClient = new AmazonCloudWatchClient(credentials)
         cloudWatchClient.setEndpoint("monitoring.amazonaws.com")
         DescribeAlarmsResult result = cloudWatchClient.describeAlarms()
@@ -218,7 +218,6 @@ public class DevOpsSpeechlet implements Speechlet {
     }
 
     private SpeechletResponse snapshotDatabase() {
-        AWSCredentials credentials = new BasicAWSCredentials("AKIAJLNQS6XTH3ESTCBQ", "4Ra3dZl9SAiY0PudxqWQUOmhIIY0JpYUW4ZfdWu+")
         AmazonRDSClient rdsClient = new AmazonRDSClient(credentials)
         CreateDBSnapshotRequest createDBSnapshotRequest = new CreateDBSnapshotRequest()
         createDBSnapshotRequest.withDBInstanceIdentifier("testDB")
@@ -228,7 +227,6 @@ public class DevOpsSpeechlet implements Speechlet {
     }
 
     private SpeechletResponse sendSnsNotification(String message, String topic) {
-        AWSCredentials credentials = new BasicAWSCredentials("AKIAJLNQS6XTH3ESTCBQ", "4Ra3dZl9SAiY0PudxqWQUOmhIIY0JpYUW4ZfdWu+")
         AmazonSNSClient snsClient = new AmazonSNSClient(credentials)
         snsClient.setEndpoint("sns.us-east-1.amazonaws.com")
         ListTopicsResult listTopicsResult = snsClient.listTopics()
@@ -253,8 +251,6 @@ public class DevOpsSpeechlet implements Speechlet {
     }
 
     private SpeechletResponse deployTomcat(String instanceState) {
-
-        AWSCredentials credentials = new BasicAWSCredentials("AKIAJLNQS6XTH3ESTCBQ", "4Ra3dZl9SAiY0PudxqWQUOmhIIY0JpYUW4ZfdWu+")
         AmazonCodeDeployClient codeDeployClient = new AmazonCodeDeployClient(credentials)
         GetApplicationRequest getApplicationRequest = new GetApplicationRequest()
         getApplicationRequest.setApplicationName("tomcat")
@@ -265,7 +261,6 @@ public class DevOpsSpeechlet implements Speechlet {
     }
 
     private SpeechletResponse buildCloudformation(String instanceState) {
-        AWSCredentials credentials = new BasicAWSCredentials("AKIAJLNQS6XTH3ESTCBQ", "4Ra3dZl9SAiY0PudxqWQUOmhIIY0JpYUW4ZfdWu+")
         AmazonCloudFormationClient cloudFormationClient = new AmazonCloudFormationClient(credentials)
         CreateStackRequest createStackRequest = new CreateStackRequest()
         createStackRequest.setStackName("Test")
@@ -291,7 +286,6 @@ public class DevOpsSpeechlet implements Speechlet {
     }
 
     private SpeechletResponse tuneAutoscaleGroup(int newNumberInstances) {
-        AWSCredentials credentials = new BasicAWSCredentials("AKIAJLNQS6XTH3ESTCBQ", "4Ra3dZl9SAiY0PudxqWQUOmhIIY0JpYUW4ZfdWu+")
         AmazonAutoScalingClient autoScalingClient = new AmazonAutoScalingClient(credentials)
         UpdateAutoScalingGroupRequest updateAutoScalingGroupRequest = new UpdateAutoScalingGroupRequest()
         updateAutoScalingGroupRequest.setMaxSize(newNumberInstances)
@@ -304,7 +298,6 @@ public class DevOpsSpeechlet implements Speechlet {
     }
 
     private SpeechletResponse instanceHealthStatuses() {
-        AWSCredentials credentials = new BasicAWSCredentials("AKIAJLNQS6XTH3ESTCBQ", "4Ra3dZl9SAiY0PudxqWQUOmhIIY0JpYUW4ZfdWu+")
         AmazonAutoScalingClient autoScalingClient = new AmazonAutoScalingClient(credentials)
         DescribeAutoScalingInstancesRequest describeAutoScalingInstancesRequest = new DescribeAutoScalingInstancesRequest()
         DescribeAutoScalingInstancesResult describeAutoScalingInstancesResult = autoScalingClient.describeAutoScalingInstances(describeAutoScalingInstancesRequest)
@@ -330,7 +323,6 @@ public class DevOpsSpeechlet implements Speechlet {
     private SpeechletResponse countInstances(String instanceState) {
 
         int instanceCount = 0
-        AWSCredentials credentials = new BasicAWSCredentials("AKIAJLNQS6XTH3ESTCBQ", "4Ra3dZl9SAiY0PudxqWQUOmhIIY0JpYUW4ZfdWu+")
         AmazonEC2Client ec2Client = new AmazonEC2Client(credentials);
         ec2Client.setEndpoint("ec2.amazonaws.com")
         Filter[] filters = new Filter[1]
