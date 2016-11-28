@@ -137,6 +137,9 @@ public class DevOpsSpeechlet implements Speechlet {
             case "deployTomcat":
                 deployTomcat("")
                 break
+            case "snapshotDatabase":
+                snapshotDatabase()
+                break
             case "buildCloudformation":
                 buildCloudformation("")
                 break
