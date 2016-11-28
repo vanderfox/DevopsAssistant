@@ -42,6 +42,10 @@ import com.amazonaws.services.ec2.model.DescribeInstancesResult
 import com.amazonaws.services.ec2.model.Filter
 import com.amazonaws.services.ec2.model.Instance
 import com.amazonaws.services.ec2.model.Reservation
+import com.amazonaws.services.rds.AmazonRDSAsyncClient
+import com.amazonaws.services.rds.AmazonRDSClient
+import com.amazonaws.services.rds.model.CreateDBSnapshotRequest
+import com.amazonaws.services.rds.model.DBSnapshot
 import com.amazonaws.services.sns.AmazonSNSClient
 import com.amazonaws.services.sns.model.ListTopicsResult
 import com.amazonaws.services.sns.model.PublishRequest
@@ -201,6 +205,16 @@ public class DevOpsSpeechlet implements Speechlet {
         List<MetricAlarm> alarms = result.getMetricAlarms()
         int alarmCount = alarms.size()
         String speechText = "I currently see ${alarmCount} CloudWatch Alarms.\n\n"
+        keepRunning ? askResponse(speechText, speechText) : tellResponse(speechText, speechText)
+    }
+
+    private SpeechletResponse snapshotDatabase() {
+        AWSCredentials credentials = new BasicAWSCredentials("AKIAJLNQS6XTH3ESTCBQ", "4Ra3dZl9SAiY0PudxqWQUOmhIIY0JpYUW4ZfdWu+")
+        AmazonRDSClient rdsClient = new AmazonRDSClient(credentials)
+        CreateDBSnapshotRequest createDBSnapshotRequest = new CreateDBSnapshotRequest()
+        createDBSnapshotRequest.withDBInstanceIdentifier("testDB")
+        DBSnapshot snapshot = rdsClient.createDBSnapshot(createDBSnapshotRequest)
+        String speechText = "I took a snapshot of your database."
         keepRunning ? askResponse(speechText, speechText) : tellResponse(speechText, speechText)
     }
 
