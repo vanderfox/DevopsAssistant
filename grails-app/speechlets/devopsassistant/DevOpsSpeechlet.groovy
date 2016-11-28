@@ -214,7 +214,7 @@ public class DevOpsSpeechlet implements Speechlet {
         List<MetricAlarm> alarms = result.getMetricAlarms()
         int alarmCount = alarms.size()
         String speechText = "I currently see ${alarmCount} CloudWatch Alarms.\n\n"
-        keepRunning ? askResponse(speechText, speechText) : tellResponse(speechText, speechText)
+        respond(speechText, speechText, keepRunning)
     }
 
     private SpeechletResponse snapshotDatabase() {
@@ -224,7 +224,7 @@ public class DevOpsSpeechlet implements Speechlet {
         createDBSnapshotRequest.withDBInstanceIdentifier("testDB")
         DBSnapshot snapshot = rdsClient.createDBSnapshot(createDBSnapshotRequest)
         String speechText = "I took a snapshot of your database."
-        keepRunning ? askResponse(speechText, speechText) : tellResponse(speechText, speechText)
+        respond(speechText, speechText, keepRunning)
     }
 
     private SpeechletResponse sendSnsNotification(String message, String topic) {
@@ -249,7 +249,7 @@ public class DevOpsSpeechlet implements Speechlet {
         } else {
             speechText = "Sorry.  I was unable to find the right topic to send a notification to."
         }
-        keepRunning ? askResponse(speechText, speechText) : tellResponse(speechText, speechText)
+        respond(speechText, speechText, keepRunning)
     }
 
     private SpeechletResponse deployTomcat(String instanceState) {
@@ -261,7 +261,7 @@ public class DevOpsSpeechlet implements Speechlet {
         GetApplicationResult getApplicationResult = codeDeployClient.getApplication(getApplicationRequest)
 
         String speechText = "OK, I've deployed Tomcat"
-        keepRunning ? askResponse(speechText, speechText) : tellResponse(speechText, speechText)
+        respond(speechText, speechText, keepRunning)
     }
 
     private SpeechletResponse buildCloudformation(String instanceState) {
@@ -287,7 +287,7 @@ public class DevOpsSpeechlet implements Speechlet {
         CreateStackResult createStackResult = cloudFormationClient.createStack(createStackRequest)
 
         String speechText = "OK, I've started building your stack.  Give it a few minutes to complete."
-        keepRunning ? askResponse(speechText, speechText) : tellResponse(speechText, speechText)
+        respond(speechText, speechText, keepRunning)
     }
 
     private SpeechletResponse tuneAutoscaleGroup(int newNumberInstances) {
@@ -300,7 +300,7 @@ public class DevOpsSpeechlet implements Speechlet {
         UpdateAuthorizerResult updateAuthorizerResult = autoScalingClient.updateAutoScalingGroup(updateAutoScalingGroupRequest)
 
         String speechText = "I have updated your autoscale group to have ${newNumberInstances}."
-        keepRunning ? askResponse(speechText, speechText) : tellResponse(speechText, speechText)
+        respond(speechText, speechText, keepRunning)
     }
 
     private SpeechletResponse instanceHealthStatuses() {
@@ -324,7 +324,7 @@ public class DevOpsSpeechlet implements Speechlet {
         for(String key: statusCounts.keySet()) {
             speechText += statusCounts.get(key) + " instances that are " + key + "\n\n\n"
         }
-        keepRunning ? askResponse(speechText, speechText) : tellResponse(speechText, speechText)
+        respond(speechText, speechText, keepRunning)
     }
 
     private SpeechletResponse countInstances(String instanceState) {
@@ -347,7 +347,29 @@ public class DevOpsSpeechlet implements Speechlet {
         }
 
         String speechText = "I currently see ${instanceCount} instances ${instanceState}.\n\n"
-        keepRunning ? askResponse(speechText, speechText) : tellResponse(speechText, speechText)
+        respond(speechText, speechText, keepRunning)
+    }
+
+    private SpeechletResponse respond(String cardText, String speechText, boolean userResponseNeeded) {
+        // Create the Simple card content.
+        SimpleCard card = new SimpleCard();
+        card.setTitle("DevOps Assistant");
+        card.setContent(cardText);
+
+        // Create the plain text output.
+        PlainTextOutputSpeech speech = new PlainTextOutputSpeech();
+        speech.setText(speechText);
+
+        // Create reprompt
+        Reprompt reprompt = new Reprompt();
+        reprompt.setOutputSpeech(speech);
+
+        if(userResponseNeeded) {
+            SpeechletResponse.newAskResponse(speech, reprompt, card);
+        } else {
+            SpeechletResponse.newTellResponse(speech, card);
+        }
+
     }
 
     private SpeechletResponse askResponse(String cardText, String speechText) {
@@ -411,7 +433,7 @@ public class DevOpsSpeechlet implements Speechlet {
      */
     private SpeechletResponse getHelpResponse(Session session) {
         String speechText = ""
-        speechText = "You can say stop or cancel to stop at any time.  You can ask me for the core values or the 12 principles.";
+        speechText = "You can say stop or cancel to stop at any time.";
         askResponse(speechText, speechText)
     }
 
