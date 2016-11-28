@@ -25,6 +25,9 @@ import com.amazonaws.auth.AWSCredentials
 import com.amazonaws.auth.BasicAWSCredentials
 import com.amazonaws.services.apigateway.model.UpdateAuthorizerResult
 import com.amazonaws.services.autoscaling.AmazonAutoScalingClient
+import com.amazonaws.services.autoscaling.model.AutoScalingInstanceDetails
+import com.amazonaws.services.autoscaling.model.DescribeAutoScalingInstancesRequest
+import com.amazonaws.services.autoscaling.model.DescribeAutoScalingInstancesResult
 import com.amazonaws.services.autoscaling.model.UpdateAutoScalingGroupRequest
 import com.amazonaws.services.cloudformation.AmazonCloudFormationClient
 import com.amazonaws.services.cloudformation.model.CreateStackRequest
@@ -152,6 +155,9 @@ public class DevOpsSpeechlet implements Speechlet {
                 Slot slot = intent.getSlot("newInstanceCount")
                 int newInstanceCount = Integer.parseInt(slot.getValue())
                 tuneAutoscaleGroup(newInstanceCount)
+                break
+            case "instanceHealthStatuses":
+                instanceHealthStatuses()
                 break
             case "sendSnsNotification":
                 sendSnsNotification("message", "lambdaNotification")
@@ -294,6 +300,30 @@ public class DevOpsSpeechlet implements Speechlet {
         UpdateAuthorizerResult updateAuthorizerResult = autoScalingClient.updateAutoScalingGroup(updateAutoScalingGroupRequest)
 
         String speechText = "I have updated your autoscale group to have ${newNumberInstances}."
+        keepRunning ? askResponse(speechText, speechText) : tellResponse(speechText, speechText)
+    }
+
+    private SpeechletResponse instanceHealthStatuses() {
+        AWSCredentials credentials = new BasicAWSCredentials("AKIAJLNQS6XTH3ESTCBQ", "4Ra3dZl9SAiY0PudxqWQUOmhIIY0JpYUW4ZfdWu+")
+        AmazonAutoScalingClient autoScalingClient = new AmazonAutoScalingClient(credentials)
+        DescribeAutoScalingInstancesRequest describeAutoScalingInstancesRequest = new DescribeAutoScalingInstancesRequest()
+        DescribeAutoScalingInstancesResult describeAutoScalingInstancesResult = autoScalingClient.describeAutoScalingInstances(describeAutoScalingInstancesRequest)
+        List<AutoScalingInstanceDetails> instances = describeAutoScalingInstancesResult.getAutoScalingInstances()
+        HashMap<String, Integer> statusCounts = new HashMap<>()
+        for(AutoScalingInstanceDetails instanceDetails: instances) {
+            instanceDetails.getHealthStatus()
+            if(statusCounts.get(instanceDetails.getHealthStatus()) != null) {
+                Integer healthCount = statusCounts.get(instanceDetails.getHealthStatus())
+                healthCount++
+                statusCounts.put(instanceDetails.getHealthStatus(), healthCount)
+            } else {
+                statusCounts.put(instanceDetails.getHealthStatus(), 1)
+            }
+        }
+        String speechText = "You have\n\n"
+        for(String key: statusCounts.keySet()) {
+            speechText += statusCounts.get(key) + " instances that are " + key + "\n\n\n"
+        }
         keepRunning ? askResponse(speechText, speechText) : tellResponse(speechText, speechText)
     }
 
