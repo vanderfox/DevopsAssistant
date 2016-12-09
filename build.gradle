@@ -103,7 +103,7 @@ assets {
 task deploy << {
     ssh.run {
         session(remotes.deadpool) {
-            put from: 'build/libs/DevopsAssistant-0.1.war', into: '/opt/tomcat/webapps/DevopsAssistant.war'
+            put from: 'build/libs/DevopsAssistant-0.1.war', into: '/opt/tomcat/webapps/devopsAssistant.war'
             execute 'sudo service tomcat restart'
         }
     }
