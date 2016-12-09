@@ -1,29 +1,51 @@
+import ch.qos.logback.classic.encoder.PatternLayoutEncoder
+import ch.qos.logback.core.ConsoleAppender
+import ch.qos.logback.core.FileAppender
+import ch.qos.logback.core.rolling.RollingFileAppender
+import ch.qos.logback.core.rolling.TimeBasedRollingPolicy
 import grails.util.BuildSettings
 import grails.util.Environment
-import org.springframework.boot.logging.logback.ColorConverter
-import org.springframework.boot.logging.logback.WhitespaceThrowableProxyConverter
 
-import java.nio.charset.Charset
-
-conversionRule 'clr', ColorConverter
-conversionRule 'wex', WhitespaceThrowableProxyConverter
+import static ch.qos.logback.classic.Level.DEBUG
 
 // See http://logback.qos.ch/manual/groovy.html for details on configuration
 appender('STDOUT', ConsoleAppender) {
     encoder(PatternLayoutEncoder) {
-        charset = Charset.forName('UTF-8')
-
-        pattern =
-                '%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} ' + // Date
-                        '%clr(%5p) ' + // Log level
-                        '%clr(---){faint} %clr([%15.15t]){faint} ' + // Thread
-                        '%clr(%-40.40logger{39}){cyan} %clr(:){faint} ' + // Logger
-                        '%m%n%wex' // Message
+        pattern = "%level %logger - %msg%n"
     }
+}
+List<String> appendersList = ['STDOUT']
+def logToFile = true
+if(logToFile) {
+    appender("ROLLING_FILE", RollingFileAppender) {
+        if (Environment.currentEnvironment == Environment.PRODUCTION) {
+            file = "/opt/tomcat/devopsAssistant.log"
+        } else {
+            file = "devopsAssistant.log"
+        }
+        rollingPolicy(TimeBasedRollingPolicy) {
+            fileNamePattern = "app.%d{yyyy-MM-dd}.log"
+            maxHistory = 30
+        }
+        encoder(PatternLayoutEncoder) {
+            pattern = "%-5p %d{yyyy-MM-dd HH:mm:ss:SS} %c{2} %m %n"
+        }
+    }
+    appendersList << "ROLLING_FILE"
+}
+root(WARN, appendersList)
+
+[
+        'com.vanderfox'
+        //'org.grails.plugins',
+        //'org.springframework',
+
+].each {
+    logger(it, DEBUG, appendersList, false)
 }
 
 def targetDir = BuildSettings.TARGET_DIR
-if (Environment.isDevelopmentMode() && targetDir != null) {
+if (Environment.isDevelopmentMode() && targetDir) {
     appender("FULL_STACKTRACE", FileAppender) {
         file = "${targetDir}/stacktrace.log"
         append = true
@@ -32,8 +54,4 @@ if (Environment.isDevelopmentMode() && targetDir != null) {
         }
     }
     logger("StackTrace", ERROR, ['FULL_STACKTRACE'], false)
-    root(ERROR, ['STDOUT', 'FULL_STACKTRACE'])
-}
-else {
-    root(ERROR, ['STDOUT'])
 }

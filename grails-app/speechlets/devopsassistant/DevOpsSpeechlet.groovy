@@ -45,7 +45,6 @@ import com.amazonaws.services.ec2.model.DescribeInstancesResult
 import com.amazonaws.services.ec2.model.Filter
 import com.amazonaws.services.ec2.model.Instance
 import com.amazonaws.services.ec2.model.Reservation
-import com.amazonaws.services.rds.AmazonRDSAsyncClient
 import com.amazonaws.services.rds.AmazonRDSClient
 import com.amazonaws.services.rds.model.CreateDBSnapshotRequest
 import com.amazonaws.services.rds.model.DBSnapshot
@@ -53,6 +52,10 @@ import com.amazonaws.services.sns.AmazonSNSClient
 import com.amazonaws.services.sns.model.ListTopicsResult
 import com.amazonaws.services.sns.model.PublishRequest
 import com.amazonaws.services.sns.model.Topic
+import groovy.transform.TypeCheckingMode
+import vanderfox.AwsCredentialsService
+import com.vanderfox.AwsCredentials
+import com.vanderfox.User
 import grails.config.Config
 import grails.web.Controller
 import groovy.transform.CompileStatic
@@ -72,6 +75,8 @@ public class DevOpsSpeechlet implements Speechlet {
 
     Config grailsConfig
     def speechletService
+    AwsCredentialsService awsCredentialsService
+
 
     @Override
     SpeechletResponse onPlaybackStarted(PlaybackStartedRequest playbackStartedRequest, Context context) throws SpeechletException {
@@ -108,7 +113,8 @@ public class DevOpsSpeechlet implements Speechlet {
             throws SpeechletException {
         log.info("onSessionStarted requestId={}, sessionId={}", request.getRequestId(),
                 session.getSessionId())
-        credentials = new BasicAWSCredentials("AKIAJLNQS6XTH3ESTCBQ", "4Ra3dZl9SAiY0PudxqWQUOmhIIY0JpYUW4ZfdWu+")
+        //credentials = new BasicAWSCredentials("AKIAJLNQS6XTH3ESTCBQ", "4Ra3dZl9SAiY0PudxqWQUOmhIIY0JpYUW4ZfdWu+")
+        loadCredentials(session)
         initializeComponents(session)
 
         // any initialization logic goes here
@@ -291,7 +297,7 @@ public class DevOpsSpeechlet implements Speechlet {
         updateAutoScalingGroupRequest.setMaxSize(newNumberInstances)
         updateAutoScalingGroupRequest.setMinSize(newNumberInstances)
         updateAutoScalingGroupRequest.setDesiredCapacity(newNumberInstances)
-        UpdateAuthorizerResult updateAuthorizerResult = autoScalingClient.updateAutoScalingGroup(updateAutoScalingGroupRequest)
+        autoScalingClient.updateAutoScalingGroup(updateAutoScalingGroupRequest)
 
         String speechText = "I have updated your autoscale group to have ${newNumberInstances}."
         respond(speechText, speechText, keepRunning)
@@ -439,6 +445,38 @@ public class DevOpsSpeechlet implements Speechlet {
      */
     private void initializeComponents(Session session) {
     }
+
+    @CompileStatic(TypeCheckingMode.SKIP)
+    private void loadCredentials(Session session) {
+
+        if (session?.user?.accessToken) {
+            log.debug("Looking up user for access token ${session.user.accessToken}")
+            User awsUser = awsCredentialsService.getUserForAccessToken(session.user.accessToken)
+            if (awsUser) {
+                AwsCredentials userCredentials = AwsCredentials.findByUserAndActive(awsUser,true)
+                log.debug("Looking up credentials for user u:${awsUser.username} id:${awsUser.id} and for access token ${session.user.accessToken}")
+                if (credentials) {
+                    log.debug("Found credentials for user ${awsUser.id} accessToken:${userCredentials.accessToken} accessTokenSecret:${userCredentials.accessTokenSecret}")
+                    credentials = new BasicAWSCredentials(userCredentials.accessToken, userCredentials.accessTokenSecret)
+                } else {
+                    log.error("Unable to find aws credentials for access token ${session.user.accessToken}")
+                }
+            } else {
+                log.error("Unable to find user for access token ${session.user.accessToken}")
+            }
+
+        }
+        if (credentials?.AWSAccessKeyId || !credentials.AWSSecretKey) {
+            // we can try defaults of some canned account to demo on file
+            log.warn("Unable to load user credentials for user, or no user token given. Loading defaults from grails properties")
+            try {
+                credentials = new BasicAWSCredentials(grailsConfig.getProperty("DevopsAssistantSpeechlet.accessToken"), grailsConfig.getProperty("DevopsAssistant.accessTokenSecret"))
+            } catch (e) {
+                log.error("Unable to retrieve aws credentials. Please set up a DevopsAssistantSpeechlet{} in grails config",e)
+            }
+        }
+    }
+
 }
 
 

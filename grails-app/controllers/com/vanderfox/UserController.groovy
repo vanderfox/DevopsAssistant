@@ -1,4 +1,4 @@
-package vanderfox
+package com.vanderfox
 
 import com.vanderfox.User
 import grails.plugin.springsecurity.SpringSecurityUtils

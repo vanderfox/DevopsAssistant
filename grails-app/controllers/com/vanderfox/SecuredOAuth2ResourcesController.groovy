@@ -1,4 +1,4 @@
-package vanderfox
+package com.vanderfox
 
 import grails.plugin.springsecurity.annotation.Secured
 

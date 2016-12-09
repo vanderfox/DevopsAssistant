@@ -1,9 +1,9 @@
 
 
 // Added by the Spring Security Core plugin:
-grails.plugin.springsecurity.userLookup.userDomainClassName = 'com.com.vanderfox.User'
-grails.plugin.springsecurity.userLookup.authorityJoinClassName = 'com.com.vanderfox.UserRole'
-grails.plugin.springsecurity.authority.className = 'com.com.vanderfox.Role'
+grails.plugin.springsecurity.userLookup.userDomainClassName = 'com.vanderfox.User'
+grails.plugin.springsecurity.userLookup.authorityJoinClassName = 'com.vanderfox.UserRole'
+grails.plugin.springsecurity.authority.className = 'com.vanderfox.Role'
 grails.plugin.springsecurity.authority.groupAuthorityNameField = 'authorities'
 grails.plugin.springsecurity.useRoleGroups = false
 grails.plugin.springsecurity.controllerAnnotations.staticRules = [
@@ -21,6 +21,7 @@ grails.plugin.springsecurity.controllerAnnotations.staticRules = [
 		[pattern: '/register/**', access: ['permitAll']],
 		//[pattern: '/logout/**', access: ['permitAll']],
 		[pattern: '/registrationCode/**', access: ['permitAll']],
+		[pattern: '/aws/**', access: ['permitAll']],
 		[pattern: '/twitter/**', access: ['permitAll']],
 		[pattern: '/securityInfo/**', access: ['permitAll']],
 		[pattern: '/user/**', access: ['permitAll']],
@@ -53,9 +54,8 @@ grails.plugin.springsecurity.oauthProvider.refreshTokenLookup.className = 'com.c
 grails.plugin.springsecurity.ui.register.emailFrom = 'skills@vanderfox.com'
 grails.plugin.springsecurity.logout.postOnly = false
 //you can put fallback credentials here - if a user is not linked, or has none it will use these to demo
-twitterSpeechlet {
-	consumerKey = ""
-	consumerSecret = ""
+DevopsAssistantSpeechlet {
+
 	accessToken = ""
 	accessTokenSecret = ""
 	// these app IDs are a comma delimited list you get from developer.amazon.com when you set up the app on your account

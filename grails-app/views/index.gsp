@@ -80,17 +80,14 @@
     <g:set var="springSecurityService" bean="springSecurityService"/>
         <a href="#page-body" class="skip"><g:message code="default.link.skip.label" default="Skip to content&hellip;"/></a>
         <div id="page-body" role="main">
-            <h1>Welcome to Twitter Search!</h1>
-            <p>Congratulations, you have successfully started your first Grails application! At the moment
-               this is the default page, feel free to modify it to either redirect to a controller or display whatever
-               content you may choose. Below is a list of controllers that are currently deployed in this application,
-               click on each to execute its default action:
+            <h1>Welcome to DevopsAssistant!</h1>
+            <p>Create an account here and link an API key to your account via the AwsCredentials so the assistant can help you! You can only have one active set of credentials at a time. Toggle them via the active flag.
 
             </p>
 
             <ul>
                 <sec:ifLoggedIn><li><a href="${g.createLink(absolute: true,uri:'/user/edit')}">Edit user profile</a></li></sec:ifLoggedIn>
-                <sec:ifLoggedIn><li><a href="${g.createLink(absolute: true,uri:'/twitterCredentials/index')}">Link Twitter Account</a></li></sec:ifLoggedIn>
+                <sec:ifLoggedIn><li><a href="${g.createLink(absolute: true,uri:'/awsCredentials/index')}">Link AWS Credentials</a></li></sec:ifLoggedIn>
             </ul>
         </div>
     </body>
