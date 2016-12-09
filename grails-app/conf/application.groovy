@@ -59,9 +59,9 @@ DevopsAssistantSpeechlet {
 	accessToken = ""
 	accessTokenSecret = ""
 	// these app IDs are a comma delimited list you get from developer.amazon.com when you set up the app on your account
-	awsApplicationId = ""
+	awsApplicationId = "amzn1.ask.skill.d1599d7d-a41d-41a9-9f3a-896b9c6fd046"
 }
 com.amazon.speech.speechlet.servlet.disableRequestSignatureCheck=true
 // these are fallback appids comma delimited
-skillsSdk.supportedApplicationIds=""
+skillsSdk.supportedApplicationIds="amzn1.ask.skill.d1599d7d-a41d-41a9-9f3a-896b9c6fd046"
 
