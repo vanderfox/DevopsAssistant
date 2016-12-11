@@ -60,7 +60,7 @@ class UserController extends grails.plugin.springsecurity.ui.UserController {
             if (params.password) {
                 restrictedProperties.put("password",params.password)
             }
-            springSecurityUiService.updateUser(params,currentUser)
+            springSecurityUiService.updateUser(restrictedProperties,currentUser)
             flash.message = "Password successfully changed"
             if (!params.id) {
                 params.put("id",currentUser.id.toString())
@@ -69,7 +69,13 @@ class UserController extends grails.plugin.springsecurity.ui.UserController {
             //return super.edit()
         } else {
             // can update roles and such
-            return super.update()
+            //return super.update()
+            springSecurityUiService.updateUser(params,currentUser)
+            flash.message = "Password successfully changed"
+            if (!params.id) {
+                params.put("id",currentUser.id.toString())
+            }
+            render(view: 'edit', model:[user:currentUser])
         }
     }
 

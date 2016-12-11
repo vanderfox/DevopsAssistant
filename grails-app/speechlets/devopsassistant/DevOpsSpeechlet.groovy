@@ -492,7 +492,7 @@ class DevOpsController {
 
 
     def index() {
-        speechletService.doSpeechlet(request,response, devopsAssistantSpeechlet)
+        speechletService.doSpeechlet(request,response, devOpsSpeechlet)
     }
 
 
