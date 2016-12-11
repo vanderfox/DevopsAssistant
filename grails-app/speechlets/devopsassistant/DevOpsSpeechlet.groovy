@@ -474,13 +474,13 @@ public class DevOpsSpeechlet implements Speechlet {
             log.debug("Looking up user for access token ${session.user.accessToken}")
             User awsUser = awsCredentialsService.getUserForAccessToken(session.user.accessToken)
             if (awsUser) {
-                AwsCredentials userCredentials = AwsCredentials.findByUserAndActive(awsUser,true)
                 log.debug("Looking up credentials for user u:${awsUser.username} id:${awsUser.id} and for access token ${session.user.accessToken}")
-                if (credentials) {
+                AwsCredentials userCredentials = AwsCredentials.findByUserAndActive(awsUser,true)
+                if (userCredentials) {
                     log.debug("Found credentials for user ${awsUser.id} accessToken:${userCredentials.accessToken} accessTokenSecret:${userCredentials.accessTokenSecret}")
                     credentials = new BasicAWSCredentials(userCredentials.accessToken, userCredentials.accessTokenSecret)
                 } else {
-                    log.error("Unable to find aws credentials for access token ${session.user.accessToken}")
+                    log.error("Unable to find aws credentials for access token ${session.user.accessToken} user: ${awsUser.username}")
                 }
             } else {
                 log.error("Unable to find user for access token ${session.user.accessToken}")
