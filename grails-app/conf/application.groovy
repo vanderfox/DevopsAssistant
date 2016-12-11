@@ -21,8 +21,9 @@ grails.plugin.springsecurity.controllerAnnotations.staticRules = [
 		[pattern: '/register/**', access: ['permitAll']],
 		//[pattern: '/logout/**', access: ['permitAll']],
 		[pattern: '/registrationCode/**', access: ['permitAll']],
-		[pattern: '/aws/**', access: ['permitAll']],
-		[pattern: '/twitter/**', access: ['permitAll']],
+		[pattern: '/awsCredentials/**', access: ['isFullyAuthenticated()']],
+		[pattern: '/devopsAssistant/devOps/**', access: ['permitAll']],
+		[pattern: '/devOps/**', access: ['permitAll']],
 		[pattern: '/securityInfo/**', access: ['permitAll']],
 		[pattern: '/user/**', access: ['permitAll']],
 		[pattern: '/role/**', access: ['ROLE_ADMIN']],
@@ -47,10 +48,10 @@ grails.plugin.springsecurity.filterChain.chainMap = [
 
 
 // Added by the Spring Security OAuth2 Provider plugin:
-grails.plugin.springsecurity.oauthProvider.clientLookup.className = 'com.com.vanderfox.Client'
-grails.plugin.springsecurity.oauthProvider.authorizationCodeLookup.className = 'com.com.vanderfox.AuthorizationCode'
-grails.plugin.springsecurity.oauthProvider.accessTokenLookup.className = 'com.com.vanderfox.AccessToken'
-grails.plugin.springsecurity.oauthProvider.refreshTokenLookup.className = 'com.com.vanderfox.RefreshToken'
+grails.plugin.springsecurity.oauthProvider.clientLookup.className = 'com.vanderfox.Client'
+grails.plugin.springsecurity.oauthProvider.authorizationCodeLookup.className = 'com.vanderfox.AuthorizationCode'
+grails.plugin.springsecurity.oauthProvider.accessTokenLookup.className = 'com.vanderfox.AccessToken'
+grails.plugin.springsecurity.oauthProvider.refreshTokenLookup.className = 'com.vanderfox.RefreshToken'
 grails.plugin.springsecurity.ui.register.emailFrom = 'skills@vanderfox.com'
 grails.plugin.springsecurity.logout.postOnly = false
 //you can put fallback credentials here - if a user is not linked, or has none it will use these to demo
@@ -59,9 +60,16 @@ DevopsAssistantSpeechlet {
 	accessToken = ""
 	accessTokenSecret = ""
 	// these app IDs are a comma delimited list you get from developer.amazon.com when you set up the app on your account
-	awsApplicationId = "amzn1.ask.skill.d1599d7d-a41d-41a9-9f3a-896b9c6fd046"
+	//awsApplicationId = "amzn1.ask.skill.d1599d7d-a41d-41a9-9f3a-896b9c6fd046"
+	awsApplicationId = ""
 }
 com.amazon.speech.speechlet.servlet.disableRequestSignatureCheck=true
 // these are fallback appids comma delimited
-skillsSdk.supportedApplicationIds="amzn1.ask.skill.d1599d7d-a41d-41a9-9f3a-896b9c6fd046"
+//skillsSdk.supportedApplicationIds="amzn1.ask.skill.d1599d7d-a41d-41a9-9f3a-896b9c6fd046"
+skillsSdk.supportedApplicationIds=""
 
+alexaSkills.supportedApplicationIds="amzn1.ask.skill.d1599d7d-a41d-41a9-9f3a-896b9c6fd046"
+alexaSkills.disableVerificationCheck = true // helpful for debugging or replay a command via curl
+alexaSkills.serializeRequests = true // this logs the requests to disk to help you debug
+alexaSkills.serializeRequestsOutputPath = "/tmp/"
+alexaSkills.oauth.redirectUrls = ['https://layla.amazon.com/spa/skill/account-linking-status.html?vendorId=M1M1AMAXAW4WEK','https://pitangui.amazon.com/spa/skill/account-linking-status.html?vendorId=M1M1AMAXAW4WEK']

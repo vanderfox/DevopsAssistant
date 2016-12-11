@@ -17,6 +17,7 @@ import com.amazon.speech.speechlet.Speechlet
 import com.amazon.speech.speechlet.SpeechletException
 import com.amazon.speech.speechlet.SpeechletResponse
 import com.amazon.speech.speechlet.SystemExceptionEncounteredRequest
+import com.amazon.speech.ui.LinkAccountCard
 import com.amazon.speech.ui.PlainTextOutputSpeech
 import com.amazon.speech.ui.Reprompt
 import com.amazon.speech.ui.SimpleCard
@@ -114,7 +115,7 @@ public class DevOpsSpeechlet implements Speechlet {
         log.info("onSessionStarted requestId={}, sessionId={}", request.getRequestId(),
                 session.getSessionId())
         //credentials = new BasicAWSCredentials("AKIAJLNQS6XTH3ESTCBQ", "4Ra3dZl9SAiY0PudxqWQUOmhIIY0JpYUW4ZfdWu+")
-        loadCredentials(session)
+
         initializeComponents(session)
 
         // any initialization logic goes here
@@ -124,18 +125,18 @@ public class DevOpsSpeechlet implements Speechlet {
     public SpeechletResponse onLaunch(final LaunchRequest request, final Session session)
             throws SpeechletException {
         log.info("onLaunch requestId={}, sessionId={}", request.getRequestId(),
-                session.getSessionId());
-        getWelcomeResponse(session);
+                session.getSessionId())
+        getWelcomeResponse(session)
     }
 
     @Override
     public SpeechletResponse onIntent(final IntentRequest request, final Session session, Context context)
             throws SpeechletException {
         log.info("onIntent requestId={}, sessionId={}", request.getRequestId(),
-                session.getSessionId());
+                session.getSessionId())
 
-        Intent intent = request.getIntent();
-        String intentName = (intent != null) ? intent.getName() : null;
+        Intent intent = request.getIntent()
+        String intentName = (intent != null) ? intent.getName() : null
         log.debug("Intent = " + intentName)
         switch (intentName) {
             case "cloudwatchAlarms":
@@ -198,9 +199,29 @@ public class DevOpsSpeechlet implements Speechlet {
      * @return SpeechletResponse spoken and visual response for the given intent
      */
     private SpeechletResponse getWelcomeResponse(Session session) {
-        String speechText = "This is the DevOps Assistant.  I will try to help with your DevOps needs.  Say help or cancel to stop, or help if you need assistance.";
+        String speechText = "This is the DevOps Assistant.  I will try to help with your DevOps needs.  I see you've linked your account! Thats Great - Say help or cancel to stop, or help if you need assistance."
         keepRunning = true
-        askResponse(speechText, speechText)
+        if (!session.user.accessToken) {
+            speechText = "This is the DevOps Assistant.  I will try to help with your DevOps needs.  I see you've haven't linked your account. Please click 'link account' in the Alexa app or check the card for more information. "
+            // Create the Simple card content.
+            LinkAccountCard card = new LinkAccountCard()
+            card.setTitle("DevOps Assistant - please link your account")
+
+
+            // Create the plain text output.
+            PlainTextOutputSpeech speech = new PlainTextOutputSpeech()
+            speech.setText(speechText)
+
+            // Create reprompt
+            Reprompt reprompt = new Reprompt()
+            reprompt.setOutputSpeech(speech)
+
+            SpeechletResponse.newTellResponse(speech, card)
+        } else {
+            loadCredentials(session)
+            askResponse(speechText, speechText)
+        }
+
     }
 
     /**

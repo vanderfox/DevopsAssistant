@@ -19,7 +19,7 @@ def logToFile = true
 if(logToFile) {
     appender("ROLLING_FILE", RollingFileAppender) {
         if (Environment.currentEnvironment == Environment.PRODUCTION) {
-            file = "/opt/tomcat/devopsAssistant.log"
+            file = "/opt/tomcat/logs/devopsAssistant.log"
         } else {
             file = "devopsAssistant.log"
         }

@@ -74,7 +74,7 @@ dependencies {
     compile 'org.springframework.social:spring-social-twitter:1.1.2.RELEASE'
     compile 'org.springframework.social:spring-social-web:1.1.4.RELEASE'
     //compile group: 'com.amazonaws', name: 'aws-java-sdk-dynamodb', version: '1.11.3'
-    compile 'org.grails.plugins:spring-security-core:3.0.4'
+    //compile 'org.grails.plugins:spring-security-core:3.0.4'
     compile "org.grails.plugins:spring-security-ui:3.0.0.M2"
     compile 'org.grails.plugins:spring-security-oauth2-provider:3.0.0-RC1'
     compile 'org.grails.plugins:mail:2.0.0.RC6'

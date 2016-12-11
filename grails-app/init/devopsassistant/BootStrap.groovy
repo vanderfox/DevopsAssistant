@@ -4,10 +4,12 @@ import com.vanderfox.Client
 import com.vanderfox.Role
 import com.vanderfox.User
 import com.vanderfox.UserRole
-
+import grails.core.GrailsApplication
 
 
 class BootStrap {
+
+    GrailsApplication grailsApplication
 
     def init = { servletContext ->
 
@@ -32,7 +34,7 @@ class BootStrap {
                 authorizedGrantTypes: ['authorization_code', 'refresh_token', 'implicit', 'password', 'client_credentials'],
                 authorities: ['ROLE_CLIENT'],
                 scopes: ['read', 'write'],
-                redirectUris: ['http://myredirect.com']
+                redirectUris: grailsApplication.config.getProperty('alexaSkills.oauth.redirectUrls')
         ).save(flush: true)
         //TODO make these configurable
         new Client(
@@ -40,7 +42,7 @@ class BootStrap {
                 authorizedGrantTypes: ['authorization_code', 'refresh_token', 'implicit', 'password', 'client_credentials'],
                 authorities: ['ROLE_CLIENT'],
                 scopes: ['read', 'write'],
-                redirectUris: ['<use the redirect uri given to you for your app on developer.amazon.com>']
+                redirectUris: grailsApplication.config.getProperty('alexaSkills.oauth.redirectUrls')
         ).save(flush: true)
 
     }
