@@ -60,7 +60,7 @@ import com.vanderfox.User
 import grails.config.Config
 import grails.web.Controller
 import groovy.transform.CompileStatic
-import org.slf4j.Logger;
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 /**
@@ -69,7 +69,7 @@ import org.slf4j.LoggerFactory
  */
 @CompileStatic
 public class DevOpsSpeechlet implements Speechlet {
-    private static final Logger log = LoggerFactory.getLogger(DevOpsSpeechlet.class);
+    private static final Logger log = LoggerFactory.getLogger(DevOpsSpeechlet.class)
     private boolean keepRunning = false
     private AWSCredentials credentials
     def grailsApplication
@@ -189,7 +189,7 @@ public class DevOpsSpeechlet implements Speechlet {
     public void onSessionEnded(final SessionEndedRequest request, final Session session)
             throws SpeechletException {
         log.info("onSessionEnded requestId={}, sessionId={}", request.getRequestId(),
-                session.getSessionId());
+                session.getSessionId())
         // any cleanup logic goes here
     }
 
@@ -229,7 +229,7 @@ public class DevOpsSpeechlet implements Speechlet {
      * @return SpeechletResponse spoken and visual response for the given intent
      */
     private SpeechletResponse sayGoodbye() {
-        String speechText = "OK.  I'm going to stop now.";
+        String speechText = "OK.  I'm going to stop now."
         tellResponse(speechText, speechText)
     }
 
@@ -349,7 +349,7 @@ public class DevOpsSpeechlet implements Speechlet {
     private SpeechletResponse countInstances(String instanceState) {
 
         int instanceCount = 0
-        AmazonEC2Client ec2Client = new AmazonEC2Client(credentials);
+        AmazonEC2Client ec2Client = new AmazonEC2Client(credentials)
         ec2Client.setEndpoint("ec2.amazonaws.com")
         Filter[] filters = new Filter[1]
         filters[0] = new Filter().withName("instance-state-name").withValues(instanceState)
@@ -370,78 +370,78 @@ public class DevOpsSpeechlet implements Speechlet {
 
     private SpeechletResponse respond(String cardText, String speechText, boolean userResponseNeeded) {
         // Create the Simple card content.
-        SimpleCard card = new SimpleCard();
-        card.setTitle("DevOps Assistant");
-        card.setContent(cardText);
+        SimpleCard card = new SimpleCard()
+        card.setTitle("DevOps Assistant")
+        card.setContent(cardText)
 
         // Create the plain text output.
-        PlainTextOutputSpeech speech = new PlainTextOutputSpeech();
-        speech.setText(speechText);
+        PlainTextOutputSpeech speech = new PlainTextOutputSpeech()
+        speech.setText(speechText)
 
         // Create reprompt
-        Reprompt reprompt = new Reprompt();
-        reprompt.setOutputSpeech(speech);
+        Reprompt reprompt = new Reprompt()
+        reprompt.setOutputSpeech(speech)
 
         if(userResponseNeeded) {
-            SpeechletResponse.newAskResponse(speech, reprompt, card);
+            SpeechletResponse.newAskResponse(speech, reprompt, card)
         } else {
-            SpeechletResponse.newTellResponse(speech, card);
+            SpeechletResponse.newTellResponse(speech, card)
         }
 
     }
 
     private SpeechletResponse askResponse(String cardText, String speechText) {
         // Create the Simple card content.
-        SimpleCard card = new SimpleCard();
-        card.setTitle("DevOps Assistant");
-        card.setContent(cardText);
+        SimpleCard card = new SimpleCard()
+        card.setTitle("DevOps Assistant")
+        card.setContent(cardText)
 
         // Create the plain text output.
-        PlainTextOutputSpeech speech = new PlainTextOutputSpeech();
-        speech.setText(speechText);
+        PlainTextOutputSpeech speech = new PlainTextOutputSpeech()
+        speech.setText(speechText)
 
         // Create reprompt
-        Reprompt reprompt = new Reprompt();
-        reprompt.setOutputSpeech(speech);
+        Reprompt reprompt = new Reprompt()
+        reprompt.setOutputSpeech(speech)
 
-        SpeechletResponse.newAskResponse(speech, reprompt, card);
+        SpeechletResponse.newAskResponse(speech, reprompt, card)
     }
 
     private SpeechletResponse tellResponse(String cardText, String speechText) {
         // Create the Simple card content.
-        SimpleCard card = new SimpleCard();
-        card.setTitle("DevOps Assistant");
-        card.setContent(cardText);
+        SimpleCard card = new SimpleCard()
+        card.setTitle("DevOps Assistant")
+        card.setContent(cardText)
 
         // Create the plain text output.
-        PlainTextOutputSpeech speech = new PlainTextOutputSpeech();
-        speech.setText(speechText);
+        PlainTextOutputSpeech speech = new PlainTextOutputSpeech()
+        speech.setText(speechText)
 
         // Create reprompt
-        Reprompt reprompt = new Reprompt();
-        reprompt.setOutputSpeech(speech);
+        Reprompt reprompt = new Reprompt()
+        reprompt.setOutputSpeech(speech)
 
-        SpeechletResponse.newTellResponse(speech, card);
+        SpeechletResponse.newTellResponse(speech, card)
     }
 
     private SpeechletResponse askResponseFancy(String cardText, String speechText, String fileUrl) {
         // Create the Simple card content.
-        SimpleCard card = new SimpleCard();
-        card.setTitle("DevOps Assistant");
-        card.setContent(cardText);
+        SimpleCard card = new SimpleCard()
+        card.setTitle("DevOps Assistant")
+        card.setContent(cardText)
 
         // Create the plain text output.
-        PlainTextOutputSpeech speech = new PlainTextOutputSpeech();
-        speech.setText(speechText);
+        PlainTextOutputSpeech speech = new PlainTextOutputSpeech()
+        speech.setText(speechText)
         log.info("making welcome audio")
         SsmlOutputSpeech fancySpeech = new SsmlOutputSpeech()
         fancySpeech.ssml = "<speak><audio src=\"${fileUrl}\"/> ${speechText}</speak>"
         log.info("finished welcome audio")
         // Create reprompt
-        Reprompt reprompt = new Reprompt();
-        reprompt.setOutputSpeech(fancySpeech);
+        Reprompt reprompt = new Reprompt()
+        reprompt.setOutputSpeech(fancySpeech)
 
-        SpeechletResponse.newAskResponse(fancySpeech, reprompt, card);
+        SpeechletResponse.newAskResponse(fancySpeech, reprompt, card)
     }
 
     /**
@@ -451,12 +451,12 @@ public class DevOpsSpeechlet implements Speechlet {
      */
     private SpeechletResponse getHelpResponse(Session session) {
         String speechText = ""
-        speechText = "You can say stop or cancel to stop at any time.";
+        speechText = "You can say stop or cancel to stop at any time."
         askResponse(speechText, speechText)
     }
 
     private SpeechletResponse didNotUnderstand() {
-        String speechText = "I'm sorry.  I didn't understand what you said.";
+        String speechText = "I'm sorry.  I didn't understand what you said."
         askResponse(speechText, speechText)
     }
 
