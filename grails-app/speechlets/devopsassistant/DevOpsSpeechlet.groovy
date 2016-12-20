@@ -115,7 +115,7 @@ public class DevOpsSpeechlet implements Speechlet {
         log.info("onSessionStarted requestId={}, sessionId={}", request.getRequestId(),
                 session.getSessionId())
         //credentials = new BasicAWSCredentials("AKIAJLNQS6XTH3ESTCBQ", "4Ra3dZl9SAiY0PudxqWQUOmhIIY0JpYUW4ZfdWu+")
-
+        loadCredentials(session)
         initializeComponents(session)
 
         // any initialization logic goes here
@@ -218,7 +218,6 @@ public class DevOpsSpeechlet implements Speechlet {
 
             SpeechletResponse.newTellResponse(speech, card)
         } else {
-            loadCredentials(session)
             askResponse(speechText, speechText)
         }
 
@@ -487,7 +486,7 @@ public class DevOpsSpeechlet implements Speechlet {
             }
 
         }
-        if (credentials?.AWSAccessKeyId || !credentials.AWSSecretKey) {
+        if (!credentials) {
             // we can try defaults of some canned account to demo on file
             log.warn("Unable to load user credentials for user, or no user token given. Loading defaults from grails properties")
             try {
